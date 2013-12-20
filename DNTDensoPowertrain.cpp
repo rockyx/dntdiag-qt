@@ -1,28 +1,7 @@
 #include "DNTDensoPowertrain.h"
 #include <dnt/RDensoPowertrain.h>
 
-DNTDensoPowertrain::DNTDensoPowertrain(const DNTCommbox &commbox, const DNTVehicleDB &db, RDensoModel model)
-  : DNTAbstractECU()
-  , _native(new RDensoPowertrain(commbox.getNative(), db.getNative(), model))
+RDensoPowertrain::RDensoPowertrain(const RCommbox &commbox, const RVehicleDB &db, Model model)
+  : RAbstractECU(commbox, db, static_cast<ModelType>(model))
 {
-  setNative(_native);
-}
-
-DNTDensoPowertrain::DNTDensoPowertrain(const DNTDensoPowertrain &other)
-  : _native(other._native)
-{
-  setNative(_native);
-}
-
-DNTDensoPowertrain& DNTDensoPowertrain::operator =(const DNTDensoPowertrain &other)
-{
-  if (this == &other) return *this;
-  _native = other._native;
-  setNative(_native);
-  return *this;
-}
-
-DNTDensoPowertrain::~DNTDensoPowertrain()
-{
-
 }

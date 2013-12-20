@@ -3,56 +3,48 @@
 
 using namespace std;
 
-DNTVehicleDB::DNTVehicleDB(const QString &absPath, const QString &vName)
-  : _native()
-{
-  auto absPathUtf8 = absPath.toUtf8();
-  auto vNameUtf8 = vName.toUtf8();
-  _native.reset(new RVehicleDB(string(absPathUtf8.data(), absPathUtf8.length()), string(vNameUtf8.data(), vNameUtf8.length())));
-}
-
-DNTVehicleDB::~DNTVehicleDB()
+RVehicleDB::RVehicleDB()
 {
 
 }
 
-DNTVehicleDB::DNTVehicleDB(const DNTVehicleDB &other)
-  : _native(other._native)
+RVehicleDB::RVehicleDB(const QString &absPath, const QString &vName)
+  : _path(absPath.toUtf8())
+  , _name(vName.toUtf8())
+  , _native(new dnt::RVehicleDB(string(_path.data(), _path.length()), string(_name.data(), _name.length())))
 {
-
 }
 
-DNTVehicleDB& DNTVehicleDB::operator =(const DNTVehicleDB &other)
+const dnt::RVehicleDBPtr &RVehicleDB::getNative() const
 {
-  if (this == &other) return *this;
-  _native = other._native;
-  return *this;
+  return _native;
 }
 
-bool DNTVehicleDB::open()
+bool RVehicleDB::open()
 {
+  if (_native) return _native->open();
+  return false;
+}
+
+bool RVehicleDB::open(const QString &absPath, const QString &vName)
+{
+  _path = absPath.toUtf8();
+  _name = vName.toUtf8();
+  _native.reset(new dnt::RVehicleDB(string(_path.data(), _path.length()), string(_name.data(), _name.length())));
   return _native->open();
 }
 
-void DNTVehicleDB::close()
+void RVehicleDB::close()
 {
-  _native->close();
+  if (_native) _native->close();
 }
 
-RVehicleDBPtr &DNTVehicleDB::getNative()
+QString RVehicleDB::getText(const QString &name, const QString &sys)
 {
-  return _native;
-}
-
-const RVehicleDBPtr &DNTVehicleDB::getNative() const
-{
-  return _native;
-}
-
-QString DNTVehicleDB::getText(const QString &name, const QString &sys)
-{
+  if (!_native) return QString();
   auto nameUtf8 = name.toUtf8();
   auto sysUtf8 = sys.toUtf8();
   auto str = _native->text()->get(string(nameUtf8.data(), nameUtf8.length()), string(sysUtf8.data(), sysUtf8.length()));
   return QString::fromUtf8(str.c_str(), str.length());
 }
+

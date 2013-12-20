@@ -1,37 +1,21 @@
 #include "DNTActiveTestFunction.h"
 #include <dnt/RActiveTestFunction.h>
 
-
-DNTActiveTestFunction::DNTActiveTestFunction(const RActiveTestFunctionPtr &native)
+RActiveTestFunction::RActiveTestFunction(const dnt::RActiveTestFunctionPtr &native)
   : _native(native)
 {
 
 }
 
-DNTActiveTestFunction::DNTActiveTestFunction(const DNTActiveTestFunction &other)
-  : _native(other._native)
+void RActiveTestFunction::changeState(ActiveState state)
 {
-
+  if (_native)
+    _native->changeState(static_cast<dnt::RActiveState>(state));
 }
 
-DNTActiveTestFunction& DNTActiveTestFunction::operator =(const DNTActiveTestFunction &other)
+bool RActiveTestFunction::execute(int mode)
 {
-  if (this == &other) return *this;
-  _native = other._native;
-  return *this;
-}
-
-DNTActiveTestFunction::~DNTActiveTestFunction()
-{
-
-}
-
-void DNTActiveTestFunction::changeState(RActiveState state)
-{
-  _native->changeState(state);
-}
-
-bool DNTActiveTestFunction::execute(int mode)
-{
-  return _native->execute(mode);
+  if (_native)
+    return _native->execute(mode);
+  return false;
 }

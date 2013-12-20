@@ -5,26 +5,23 @@
 #ifndef __DNT_SERIALPORTTHREAD_H__
 #define __DNT_SERIALPORTTHREAD_H__
 
-#include <QtSerialPort/QSerialPortInfo>
-#include <QThread>
-#include <QThreadPool>
-#include <QRunnable>
-#include <QSharedPointer>
 #include <DNTGlobal.h>
 
+class RSerialPortThread;
+typedef QSharedPointer<RSerialPortThread> RSerialPortThreadPtr;
 
-class DNTSerialPortThread : public QObject
+class RSerialPortThread : public QObject
 {
 private:
-  RIOBufferPtr _buffer;
-  RSerialPortPtr _port;
+  dnt::RIOBufferPtr _buffer;
+  dnt::RSerialPortPtr _port;
   QRunnable *_read;
   QRunnable *_write;
   QThreadPool _pool;
 public:
-  DNTSerialPortThread(const RIOBufferPtr& buffer);
-  ~DNTSerialPortThread();
-  RSerialPortPtr getPort();
+  RSerialPortThread(const dnt::RIOBufferPtr& buffer);
+  ~RSerialPortThread();
+  dnt::RSerialPortPtr getPort();
   void start();
 private slots:
 };

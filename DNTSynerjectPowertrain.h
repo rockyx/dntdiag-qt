@@ -5,23 +5,26 @@
 #ifndef __DNT_ECU_SYNERJECTPOWERTRAIN_H__
 #define __DNT_ECU_SYNERJECTPOWERTRAIN_H__
 
-#include <DNTGlobal.h>
+#ifndef Q_MOC_RUN
+#include <dnt/RSynerject.h>
+#include <dnt/RSynerjectPowertrain.h>
+#endif
 #include <DNTAbstractECU.h>
 #include <DNTCommbox.h>
 #include <DNTVehicleDB.h>
-#ifndef Q_MOC_RUN
-#include <dnt/RSynerject.h>
-#endif
 
-class DNT_ECU_DECL DNTSynerjectPowertrain : public DNTAbstractECU
+class DNT_ECU_DECL RSynerjectPowertrain : public RAbstractECU<dnt::RSynerjectPowertrain, dnt::RSynerjectModel>
 {
-private:
-  RSynerjectPowertrainPtr _native;
 public:
-  DNTSynerjectPowertrain(const DNTCommbox &commbox, const DNTVehicleDB &db, RSynerjectModel model);
-  DNTSynerjectPowertrain(const DNTSynerjectPowertrain &other);
-  DNTSynerjectPowertrain& operator=(const DNTSynerjectPowertrain &other);
-  ~DNTSynerjectPowertrain();
+  enum Model
+  {
+    QM125T_8H = dnt::RSynerjectModel::QM125T_8H,
+    QM250GY = dnt::RSynerjectModel::QM250GY,
+    QM250T = dnt::RSynerjectModel::QM250T
+  };
+
+public:
+  RSynerjectPowertrain(const RCommbox &commbox, const RVehicleDB &db, Model model);
   QString getVersion();
 };
 

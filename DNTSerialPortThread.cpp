@@ -7,24 +7,24 @@
 class SerialPortRead : public QRunnable
 {
 private:
-  RSerialPortPtr _port;
-  RIOBufferPtr _buffer;
+  dnt::RSerialPortPtr _port;
+  dnt::RIOBufferPtr _buffer;
 public:
-  SerialPortRead(const RSerialPortPtr &port, const RIOBufferPtr &buffer);
+  SerialPortRead(const dnt::RSerialPortPtr &port, const dnt::RIOBufferPtr &buffer);
   void run() Q_DECL_OVERRIDE;
 };
 
 class SerialPortWrite : public QRunnable
 {
 private:
-  RSerialPortPtr _port;
-  RIOBufferPtr _buffer;
+  dnt::RSerialPortPtr _port;
+  dnt::RIOBufferPtr _buffer;
 public:
-  SerialPortWrite(const RSerialPortPtr &port, const RIOBufferPtr &buffer);
+  SerialPortWrite(const dnt::RSerialPortPtr &port, const dnt::RIOBufferPtr &buffer);
   void run() Q_DECL_OVERRIDE;
 };
 
-SerialPortRead::SerialPortRead(const RSerialPortPtr &port, const RIOBufferPtr &buffer)
+SerialPortRead::SerialPortRead(const dnt::RSerialPortPtr &port, const dnt::RIOBufferPtr &buffer)
   : _port(port)
   , _buffer(buffer)
 {
@@ -46,7 +46,7 @@ void SerialPortRead::run()
   }
 }
 
-SerialPortWrite::SerialPortWrite(const RSerialPortPtr &port, const RIOBufferPtr &buffer)
+SerialPortWrite::SerialPortWrite(const dnt::RSerialPortPtr &port, const dnt::RIOBufferPtr &buffer)
   : _port(port)
   , _buffer(buffer)
 {
@@ -69,9 +69,9 @@ void SerialPortWrite::run()
   }
 }
 
-DNTSerialPortThread::DNTSerialPortThread(const RIOBufferPtr &buffer)
+RSerialPortThread::RSerialPortThread(const dnt::RIOBufferPtr &buffer)
   : _buffer(buffer)
-  , _port(new RSerialPort())
+  , _port(new dnt::RSerialPort())
   , _read(new SerialPortRead(_port, _buffer))
   , _write(new SerialPortWrite(_port, _buffer))
   , _pool()
@@ -80,7 +80,7 @@ DNTSerialPortThread::DNTSerialPortThread(const RIOBufferPtr &buffer)
   _write->setAutoDelete(false);
 }
 
-DNTSerialPortThread::~DNTSerialPortThread()
+RSerialPortThread::~RSerialPortThread()
 {
   _port->close();
   _pool.waitForDone();
@@ -88,12 +88,12 @@ DNTSerialPortThread::~DNTSerialPortThread()
   delete _write;
 }
 
-RSerialPortPtr DNTSerialPortThread::getPort()
+dnt::RSerialPortPtr RSerialPortThread::getPort()
 {
   return _port;
 }
 
-void DNTSerialPortThread::start()
+void RSerialPortThread::start()
 {
   _pool.start(_write);
   _pool.start(_read);

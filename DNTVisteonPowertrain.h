@@ -5,21 +5,22 @@
 #ifndef __DNT_ECU_VISTEONPOWERTRAIN_H__
 #define __DNT_ECU_VISTEONPOWERTRAIN_H__
 
-#include <DNTGlobal.h>
-#include <DNTAbstractECU.h>
 #ifndef Q_MOC_RUN
 #include <dnt/RVisteon.h>
+#include <dnt/RVisteonPowertrain.h>
 #endif
+#include <DNTAbstractECU.h>
 
-class DNT_ECU_DECL DNTVisteonPowertrain : public DNTAbstractECU
+class DNT_ECU_DECL RVisteonPowertrain : public RAbstractECU<dnt::RVisteonPowertrain, dnt::RVisteonModel>
 {
-private:
-  RVisteonPowertrainPtr _native;
 public:
-  DNTVisteonPowertrain(const RICommboxPtr &boxNative, const RVehicleDBPtr &dbNative, RVisteonModel model);
-  DNTVisteonPowertrain(const DNTVisteonPowertrain &other);
-  DNTVisteonPowertrain& operator=(const DNTVisteonPowertrain &other);
-  ~DNTVisteonPowertrain();
+  enum Model
+  {
+    QM250J_2L = dnt::RVisteonModel::QM250J_2L
+  };
+
+public:
+  RVisteonPowertrain(const RCommbox &box, const RVehicleDB &db, Model model);
 };
 
 #endif // __DNT_ECU_VISTEONPOWERTRAIN_H__

@@ -6,13 +6,13 @@
 #define __DNT_LIVEDATAITEM_H__
 
 #include <DNTGlobal.h>
-#include <QString>
 
-class DNT_DIAG_DECL DNTLiveDataItem
+class DNT_DIAG_DECL RLiveDataItem
 {
-  friend class DNTLiveDataList;
+  friend class RLiveDataList;
+  friend bool DNT_DIAG_DECL operator == (const RLiveDataItem &left, const RLiveDataItem &right);
 private:
-  RLiveDataItemPtr _native;
+  dnt::RLiveDataItemPtr _native;
   QString _shortName;
   QString _content;
   QString _unit;
@@ -26,13 +26,10 @@ private:
   int _index;
   QByteArray _cmd;
 private:
-  DNTLiveDataItem(const RLiveDataItemPtr &native);
+  RLiveDataItem(const dnt::RLiveDataItemPtr &native);
   void getDatas();
 public:
-  DNTLiveDataItem();
-  DNTLiveDataItem(const DNTLiveDataItem &other);
-  DNTLiveDataItem& operator=(const DNTLiveDataItem &other);
-  ~DNTLiveDataItem();
+  RLiveDataItem();
   const QString &shortName() const;
   const QString &content() const;
   const QString &unit() const;
@@ -40,18 +37,20 @@ public:
   const QString &description() const;
   const QString &cmdName() const;
   const QString &cmdClass() const;
-  int index() const;
-  int position() const;
+  int index();
+  int position();
   bool isEnabled() const;
   bool isShowed() const;
-  bool isOutOfRange() const;
-  QString minValue();
-  QString maxValue();
-  QByteArray command();
+  bool isOutOfRange();
+  const QString &minValue() const;
+  const QString &maxValue() const;
+  const QByteArray &command() const;
   const QString &value() const;
-  DNT_DIAG_DECL friend bool operator==(const DNTLiveDataItem &left, const DNTLiveDataItem &right);
+  void setIsShowed(bool value);
 };
 
-DNT_DIAG_DECL bool operator==(const DNTLiveDataItem &left, const DNTLiveDataItem &right);
+bool DNT_DIAG_DECL operator == (const RLiveDataItem &left, const RLiveDataItem &right);
+
+typedef QSharedPointer<RLiveDataItem> RLiveDataItemPtr;
 
 #endif // __DNT_LIVEDATAITEM_H__

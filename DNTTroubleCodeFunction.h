@@ -5,25 +5,44 @@
 #ifndef __DNT_TROUBLECODEFUNCTION_H__
 #define __DNT_TROUBLECODEFUNCTION_H__
 
-#include <DNTGlobal.h>
+#ifndef Q_MOC_RUN
+#include <dnt/RTroubleCodeFunction.h>
+#endif
 #include <DNTTroubleCodeVector.h>
 
-class DNT_DIAG_DECL DNTTroubleCodeFunction
+class DNT_DIAG_DECL RTroubleCodeFunction : public QObject
 {
-  friend class DNTAbstractECU;
+  Q_OBJECT
+  template<typename NativePtr, typename Model> friend class RAbstractECU;
 private:
-  RTroubleCodeFunctionPtr _native;
-  DNTTroubleCodeVector _tcs;
+  dnt::RTroubleCodeFunctionPtr _native;
+  QFutureWatcher<dnt::RTroubleCodeVectorPtr> _currentWatcher;
+  QFuture<dnt::RTroubleCodeVectorPtr> _currentFuture;
+  QFutureWatcher<dnt::RTroubleCodeVectorPtr> _historyWatcher;
+  QFuture<dnt::RTroubleCodeVectorPtr> _historyFuture;
+  QFutureWatcher<bool> _clearWatcher;
+  QFuture<bool> _clearFuture;
 private:
-  DNTTroubleCodeFunction(const RTroubleCodeFunctionPtr &native = RTroubleCodeFunctionPtr());
+  RTroubleCodeFunction(const dnt::RTroubleCodeFunctionPtr &native = dnt::RTroubleCodeFunctionPtr());
 public:
-  DNTTroubleCodeFunction(const DNTTroubleCodeFunction &other);
-  DNTTroubleCodeFunction& operator=(const DNTTroubleCodeFunction &other);
-  ~DNTTroubleCodeFunction();
-  bool readCurrent();
-  bool readHistory();
-  bool clear();
-  DNTTroubleCodeVector getTroubleCodes();
+  // return false if start fail(consider still running, or native is nullptr
+  bool tryReadCurrent();
+  bool tryReadHistory();
+  bool tryClear();
+  RTroubleCodeVector waitCurrentFinish();
+  RTroubleCodeVector waitHistoryFinish();
+  bool waitClearFinish();
+  QString getMessage();
+public slots:
+  void sendCurrentFinished();
+  void sendHistoryFinished();
+  void sendClearFinished();
+signals:
+  void currentFinished(const QString &text, const RTroubleCodeVector &tcs);
+  void historyFinished(const QString &text, const RTroubleCodeVector &tcs);
+  void clearFinished(const QString &text, bool result);
 };
+
+typedef QSharedPointer<RTroubleCodeFunction> RTroubleCodeFunctionPtr;
 
 #endif // __DNT_TROUBLECODEFUNCTION_H__

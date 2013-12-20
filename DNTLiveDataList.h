@@ -5,52 +5,39 @@
 #ifndef __DNT_LIVEDATALIST_H__
 #define __DNT_LIVEDATALIST_H__
 
-#include <QList>
-#include <DNTGlobal.h>
 #include <DNTLiveDataItem.h>
 
-class DNT_DIAG_DECL DNTLiveDataList
+class DNT_DIAG_DECL RLiveDataList
 {
-  friend class DNTDataStreamFunction;
+  friend class RDataStreamFunction;
 public:
-  typedef QList<DNTLiveDataItem> Elements;
+  typedef QList<RLiveDataItem> Elements;
 private:
-  RLiveDataListPtr _native;
+  dnt::RLiveDataListPtr _native;
   Elements _data;
   Elements _enabledItems;
   Elements _showedItems;
 private:
-  void addItems();
+  void saveItems();
   void fillEnabledItems();
   void fillShowedItems();
 private:
-  DNTLiveDataList(const RLiveDataListPtr &native = RLiveDataListPtr());
+  RLiveDataList(const dnt::RLiveDataListPtr &native = dnt::RLiveDataListPtr());
 public:
-  DNTLiveDataList(const DNTLiveDataList &other);
-  DNTLiveDataList& operator=(const DNTLiveDataList &other);
-  ~DNTLiveDataList();
-//  int enabledCount();
-//  int enabledCount() const;
-//  int showedCount();
-//  int showedCount() const;
   int nextShowedIndex();
-  int nextShowedIndex() const;
-//  int getEnabledIndex(int index);
-//  int getEnabledIndex(int index) const;
   int getShowedPosition(int index);
-  int getShowedPosition(int index) const;
-//  int getShowedIndex(int index);
-//  int getShowedIndex(int index) const;
-//  void collateEnable();
-//  void collateShowed();
   void collate();
   bool isEmpty();
-  bool isEmpty() const;
-  DNTLiveDataItem& operator[](int index);
-  const DNTLiveDataItem& operator[](int index) const;
-//  Elements items();
-  Elements getEnabledItems();
-  Elements getShowedItems();
+  RLiveDataItem & operator[](int index);
+  const RLiveDataItem& operator[](int index) const;
+  const Elements& getEnabledItems() const;
+  const Elements& getShowedItems() const;
+  inline int size()
+  {
+    return _data.size();
+  }
 };
+
+typedef QSharedPointer<RLiveDataList> RLiveDataListPtr;
 
 #endif // __DNT_LIVEDATALIST_H__

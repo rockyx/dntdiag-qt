@@ -1,9 +1,11 @@
 #include "DNTTroubleCodeItem.h"
 #include <dnt/RTroubleCodeItem.h>
 
-DNTTroubleCodeItem::DNTTroubleCodeItem(const RTroubleCodeItemPtr &native)
-  : _native(native)
+void RTroubleCodeItem::prepareData()
 {
+  if (!_native)
+    return;
+
   auto str = _native->getCode();
   _code = QString::fromUtf8(str.c_str(), str.length());
 
@@ -12,44 +14,48 @@ DNTTroubleCodeItem::DNTTroubleCodeItem(const RTroubleCodeItemPtr &native)
 
   str = _native->getDescription();
   _description = QString::fromUtf8(str.c_str(), str.length());
-
 }
 
-DNTTroubleCodeItem::DNTTroubleCodeItem(const DNTTroubleCodeItem &other)
-  : _native(other._native)
+RTroubleCodeItem::RTroubleCodeItem(const dnt::RTroubleCodeItemPtr &native)
+  : _native(native)
 {
-
+  prepareData();
 }
 
-DNTTroubleCodeItem& DNTTroubleCodeItem::operator =(const DNTTroubleCodeItem &other)
+RTroubleCodeItem::RTroubleCodeItem()
 {
-  if (this == &other) return *this;
-  _native = other._native;
-  return *this;
 }
 
-DNTTroubleCodeItem::~DNTTroubleCodeItem()
-{
-
-}
-
-bool operator ==(const DNTTroubleCodeItem &left, const DNTTroubleCodeItem &right)
-{
-  if (&left == &right) return true;
-  return left._native == right._native;
-}
-
-const QString &DNTTroubleCodeItem::getCode() const
+const QString &RTroubleCodeItem::getCode() const
 {
   return _code;
 }
 
-const QString &DNTTroubleCodeItem::getContent() const
+QString &RTroubleCodeItem::getCode()
+{
+  return _code;
+}
+
+QString &RTroubleCodeItem::getContent()
 {
   return _content;
 }
 
-const QString &DNTTroubleCodeItem::getDescription() const
+const QString &RTroubleCodeItem::getContent() const
+{
+  return _content;
+}
+
+QString &RTroubleCodeItem::getDescription()
 {
   return _description;
+}
+
+const QString &RTroubleCodeItem::getDescription() const
+{
+  return _description;
+}
+bool operator == (const RTroubleCodeItem &left, const RTroubleCodeItem &right)
+{
+  return left._native == right._native;
 }

@@ -5,23 +5,26 @@
 #ifndef __DNT_DENSOPOWERTRAIN_H__
 #define __DNT_DENSOPOWERTRAIN_H__
 
-#include <DNTGlobal.h>
+#ifndef Q_MOC_RUN
+#include <dnt/RDenso.h>
+#include <dnt/RDensoPowertrain.h>
+#endif
 #include <DNTAbstractECU.h>
 #include <DNTCommbox.h>
 #include <DNTVehicleDB.h>
-#ifndef Q_MOC_RUN
-#include <dnt/RDenso.h>
-#endif
 
-class DNT_ECU_DECL DNTDensoPowertrain : public DNTAbstractECU
+class DNT_ECU_DECL RDensoPowertrain : public RAbstractECU<dnt::RDensoPowertrain, dnt::RDensoModel>
 {
-private:
-  RDensoPowertrainPtr _native;
 public:
-  DNTDensoPowertrain(const DNTCommbox &commbox, const DNTVehicleDB &db, RDensoModel model);
-  DNTDensoPowertrain(const DNTDensoPowertrain &other);
-  DNTDensoPowertrain& operator=(const DNTDensoPowertrain &other);
-  ~DNTDensoPowertrain();
+  enum Model
+  {
+    DCJ_GW250 = dnt::RDensoModel::DCJ_GW250
+  };
+
+public:
+  RDensoPowertrain(const RCommbox &commbox, const RVehicleDB &db, Model model);
 };
+
+typedef QSharedPointer<RDensoPowertrain> RDensoPowertrainPtr;
 
 #endif // __DNT_DENSOPOWERTRAIN_H__

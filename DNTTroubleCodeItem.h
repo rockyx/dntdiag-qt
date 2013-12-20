@@ -5,31 +5,34 @@
 #ifndef __DNT_TROUBLECODEITEM_H__
 #define __DNT_TROUBLECODEITEM_H__
 
-#include <QString>
-#include <QSharedPointer>
 #include <DNTGlobal.h>
 
-class DNT_DIAG_DECL DNTTroubleCodeItem
+class RTroubleCodeItem;
+typedef QSharedPointer<RTroubleCodeItem> RTroubleCodeItemPtr;
+
+class DNT_DIAG_DECL RTroubleCodeItem
 {
-  friend class DNTTroubleCodeVector;
-  friend class QVector<DNTTroubleCodeItem>;
+  friend class RTroubleCodeVector;
+  friend class QVector<RTroubleCodeItem>;
+  friend bool operator == (const RTroubleCodeItem &left, const RTroubleCodeItem &right);
 private:
-  RTroubleCodeItemPtr _native;
+  dnt::RTroubleCodeItemPtr _native;
   QString _code;
   QString _content;
   QString _description;
 private:
-  DNTTroubleCodeItem(const RTroubleCodeItemPtr &native = RTroubleCodeItemPtr());
+  RTroubleCodeItem(const dnt::RTroubleCodeItemPtr &native);
+  void prepareData();
 public:
-  DNTTroubleCodeItem(const DNTTroubleCodeItem &other);
-  DNTTroubleCodeItem & operator=(const DNTTroubleCodeItem &other);
-  friend bool operator==(const DNTTroubleCodeItem &left, const DNTTroubleCodeItem &right);
-  ~DNTTroubleCodeItem();
-  const QString& getCode() const;
-  const QString& getContent() const;
-  const QString& getDescription() const;
+  RTroubleCodeItem();
+  const QString &getCode() const;
+  QString& getCode();
+  const QString &getContent() const;
+  QString &getContent();
+  const QString &getDescription() const;
+  QString &getDescription();
 };
 
-bool operator==(const DNTTroubleCodeItem &left, const DNTTroubleCodeItem &right);
+bool operator == (const RTroubleCodeItem &left, const RTroubleCodeItem &right);
 
 #endif // __DNT_TROUBLECODEITEM_H__

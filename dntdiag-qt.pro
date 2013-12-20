@@ -222,8 +222,7 @@ SOURCES += \
     DNTDataStreamFunction.cpp \
     DNTCommbox.cpp \
     DNTBoschCanbusChassis.cpp \
-    DNTActiveTestFunction.cpp \
-    DNTAbstractECU.cpp
+    DNTActiveTestFunction.cpp
 
 HEADERS +=  \
     native/cryptopp/zlib.h \

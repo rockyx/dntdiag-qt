@@ -5,22 +5,24 @@
 #ifndef __DNT_TROUBLECODEVECTOR_H__
 #define __DNT_TROUBLECODEVECTOR_H__
 
-#include <QVector>
 #include <DNTTroubleCodeItem.h>
 
-class DNT_DIAG_DECL DNTTroubleCodeVector : public QVector<DNTTroubleCodeItem>
+class DNT_DIAG_DECL RTroubleCodeVector : public QVector<RTroubleCodeItem>
 {
-  friend class DNTTroubleCodeFunction;
+  friend class RTroubleCodeFunction;
+  friend class RTroubleCodeData;
 private:
-  RTroubleCodeVectorPtr _native;
+  bool _null;
 private:
-  DNTTroubleCodeVector(const RTroubleCodeVectorPtr &native);
+  RTroubleCodeVector(const dnt::RTroubleCodeVectorPtr &native);
   void addItems();
 public:
-  DNTTroubleCodeVector();
-  DNTTroubleCodeVector(const DNTTroubleCodeVector &other);
-  DNTTroubleCodeVector& operator=(const DNTTroubleCodeVector& other);
-  ~DNTTroubleCodeVector();
+  RTroubleCodeVector();
+  bool isNull() const;
 };
+
+Q_DECLARE_METATYPE(RTroubleCodeVector)
+
+typedef QSharedPointer<RTroubleCodeVector> RTroubleCodeVectorPtr;
 
 #endif // __DNT_TROUBLECODEVECTOR_H__

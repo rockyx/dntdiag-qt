@@ -1,60 +1,37 @@
 #include "DNTLiveDataList.h"
 #include <dnt/RLiveDataList.h>
 
-DNTLiveDataList::DNTLiveDataList(const RLiveDataListPtr &native)
+RLiveDataList::RLiveDataList(const dnt::RLiveDataListPtr &native)
   : _native(native)
-  , _data()
 {
-  addItems();
+  saveItems();
   fillEnabledItems();
   fillShowedItems();
 }
 
-DNTLiveDataList::DNTLiveDataList(const DNTLiveDataList &other)
-  : _native(other._native)
-  , _data(other._data)
-  , _enabledItems(other._enabledItems)
-  , _showedItems(other._showedItems)
-{
-
-}
-
-DNTLiveDataList& DNTLiveDataList::operator =(const DNTLiveDataList &other)
-{
-  if (this == &other) return *this;
-  _native = other._native;
-  _data = other._data;
-  _enabledItems = other._enabledItems;
-  _showedItems =other._showedItems;
-  return *this;
-}
-
-DNTLiveDataList::~DNTLiveDataList()
-{
-
-}
-
-void DNTLiveDataList::addItems()
+void RLiveDataList::saveItems()
 {
   if (!_native)
     return;
+  _data.clear();
   auto size = _native->size();
   for (int i = 0; i < size; ++i)
-    _data.append(DNTLiveDataItem(_native->get(i)));
+    _data.append(RLiveDataItem(_native->get(i)));
 }
 
-void DNTLiveDataList::fillEnabledItems()
+void RLiveDataList::fillEnabledItems()
 {
   _enabledItems.clear();
   if (!_native) return;
   auto size = _native->getEnabledCount();
   for (int i = 0; i < size; ++i) {
     auto index = _native->getEnabledIndex(i);
+    if (index == -1) break;
     _enabledItems.append(_data[index]);
   }
 }
 
-void DNTLiveDataList::fillShowedItems()
+void RLiveDataList::fillShowedItems()
 {
   _showedItems.clear();
   if (!_native) return;
@@ -65,35 +42,21 @@ void DNTLiveDataList::fillShowedItems()
   }
 }
 
-int DNTLiveDataList::nextShowedIndex()
+int RLiveDataList::nextShowedIndex()
 {
   if (_native)
     return _native->getNextShowedIndex();
   return 0;
 }
 
-int DNTLiveDataList::nextShowedIndex() const
-{
-  if (_native)
-    return _native->getNextShowedIndex();
-  return 0;
-}
-
-int DNTLiveDataList::getShowedPosition(int index)
+int RLiveDataList::getShowedPosition(int index)
 {
   if (_native)
     return _native->getShowedPosition(index);
   return 0;
 }
 
-int DNTLiveDataList::getShowedPosition(int index) const
-{
-  if (_native)
-    return _native->getShowedPosition(index);
-  return 0;
-}
-
-void DNTLiveDataList::collate()
+void RLiveDataList::collate()
 {
   if (!_native) return;
 
@@ -104,39 +67,31 @@ void DNTLiveDataList::collate()
   fillShowedItems();
 }
 
-bool DNTLiveDataList::isEmpty()
+bool RLiveDataList::isEmpty()
 {
   if (_native)
     return _native->empty();
   return true;
 }
 
-bool DNTLiveDataList::isEmpty() const
-{
-  if (_native)
-    return _native->empty();
-  return true;
-}
-
-DNTLiveDataItem& DNTLiveDataList::operator [](int index)
+RLiveDataItem& RLiveDataList::operator [](int index)
 {
   assert(_native);
   return _data[index];
 }
 
-const DNTLiveDataItem& DNTLiveDataList::operator [](int index) const
+const RLiveDataItem& RLiveDataList::operator [](int index) const
 {
   assert(_native);
   return _data[index];
 }
 
-DNTLiveDataList::Elements DNTLiveDataList::getEnabledItems()
+const RLiveDataList::Elements& RLiveDataList::getEnabledItems() const
 {
   return _enabledItems;
 }
 
-DNTLiveDataList::Elements DNTLiveDataList::getShowedItems()
+const RLiveDataList::Elements& RLiveDataList::getShowedItems() const
 {
   return _showedItems;
 }
-

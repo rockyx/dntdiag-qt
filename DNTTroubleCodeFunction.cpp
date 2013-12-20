@@ -1,50 +1,96 @@
 #include "DNTTroubleCodeFunction.h"
-#include <dnt/RTroubleCodeFunction.h>
 
-DNTTroubleCodeFunction::DNTTroubleCodeFunction(const RTroubleCodeFunctionPtr &native)
+RTroubleCodeFunction::RTroubleCodeFunction(const dnt::RTroubleCodeFunctionPtr &native)
   : _native(native)
-  , _tcs()
-{
-  if (_native)
-    _tcs = DNTTroubleCodeVector(_native->getTroubleCodes());
-}
-
-DNTTroubleCodeFunction::DNTTroubleCodeFunction(const DNTTroubleCodeFunction &other)
-  : _native(other._native)
-  , _tcs(other._tcs)
+  , _currentWatcher()
+  , _currentFuture()
+  , _historyWatcher()
+  , _historyFuture()
+  , _clearWatcher()
+  , _clearFuture()
 {
 
 }
 
-DNTTroubleCodeFunction& DNTTroubleCodeFunction::operator =(const DNTTroubleCodeFunction &other)
+bool RTroubleCodeFunction::tryReadCurrent()
 {
-  if (this == &other) return *this;
-  _native = other._native;
-  _tcs = other._tcs;
-  return *this;
+  if (_currentWatcher.isRunning()) return false;
+  if (!_native) return false;
+
+  _currentWatcher.disconnect();
+  connect(&_currentWatcher, SIGNAL(finished()), this, SLOT(sendCurrentFinished()));
+  _currentFuture = QtConcurrent::run(_native.get(), &dnt::RTroubleCodeFunction::current);
+  _currentWatcher.setFuture(_currentFuture);
+
+  return true;
 }
 
-DNTTroubleCodeFunction::~DNTTroubleCodeFunction()
+bool RTroubleCodeFunction::tryReadHistory()
 {
+  if (_historyWatcher.isRunning()) return false;
+  if (!_native) return false;
 
+  _historyWatcher.disconnect();
+  connect(&_historyWatcher, SIGNAL(finished()), this, SLOT(sendHistoryFinished()));
+  _historyFuture = QtConcurrent::run(_native.get(), &dnt::RTroubleCodeFunction::history);
+  _historyWatcher.setFuture(_historyFuture);
+  return true;
 }
 
-bool DNTTroubleCodeFunction::readCurrent()
+bool RTroubleCodeFunction::tryClear()
 {
-  return _native->current();
+  if (_clearWatcher.isRunning()) return false;
+  if (!_native) return false;
+
+  _clearWatcher.disconnect();
+  connect(&_clearWatcher, SIGNAL(finished()), this, SLOT(sendClearFinished()));
+  _clearFuture = QtConcurrent::run(_native.get(), &dnt::RTroubleCodeFunction::clear);
+  _clearWatcher.setFuture(_clearFuture);
+  return true;
 }
 
-bool DNTTroubleCodeFunction::readHistory()
+RTroubleCodeVector RTroubleCodeFunction::waitCurrentFinish()
 {
-  return _native->history();
+  _currentWatcher.waitForFinished();
+  return RTroubleCodeVector(_currentFuture.result());
 }
 
-bool DNTTroubleCodeFunction::clear()
+RTroubleCodeVector RTroubleCodeFunction::waitHistoryFinish()
 {
-  return _native->clear();
+  _historyWatcher.waitForFinished();
+  return RTroubleCodeVector(_historyFuture.result());
 }
 
-DNTTroubleCodeVector DNTTroubleCodeFunction::getTroubleCodes()
+bool RTroubleCodeFunction::waitClearFinish()
 {
-  return _tcs;
+  _clearWatcher.waitForFinished();
+  return _clearFuture.result();
 }
+
+void RTroubleCodeFunction::sendCurrentFinished()
+{
+  auto ret = RTroubleCodeVector(_currentFuture.result());
+  QString message = QString::fromUtf8(_native->getMessage().c_str());
+  emit currentFinished(message, ret);
+}
+
+void RTroubleCodeFunction::sendHistoryFinished()
+{
+  auto ret = RTroubleCodeVector(_historyFuture.result());
+  QString message = QString::fromUtf8(_native->getMessage().c_str());
+  emit historyFinished(message, ret);
+}
+
+void RTroubleCodeFunction::sendClearFinished()
+{
+  auto ret = _clearFuture.result();
+  QString message = QString::fromUtf8(_native->getMessage().c_str());
+  emit clearFinished(message, ret);
+}
+
+QString RTroubleCodeFunction::getMessage()
+{
+  if (!_native) return QString();
+  return QString::fromUtf8(_native->getMessage().c_str());
+}
+

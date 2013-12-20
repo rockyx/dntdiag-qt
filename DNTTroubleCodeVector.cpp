@@ -1,45 +1,24 @@
 #include "DNTTroubleCodeVector.h"
 #include <dnt/RTroubleCodeVector.h>
 
-DNTTroubleCodeVector::DNTTroubleCodeVector(const RTroubleCodeVectorPtr &native)
-  : _native(native)
+RTroubleCodeVector::RTroubleCodeVector(const dnt::RTroubleCodeVectorPtr &native)
+  : _null(native ? false : true)
 {
-  addItems();
-}
+  if (!native) return;
 
-DNTTroubleCodeVector::DNTTroubleCodeVector()
-  : _native()
-{
-
-}
-
-DNTTroubleCodeVector::DNTTroubleCodeVector(const DNTTroubleCodeVector &other)
-  : _native(other._native)
-{
-  addItems();
-}
-
-DNTTroubleCodeVector& DNTTroubleCodeVector::operator =(const DNTTroubleCodeVector &other)
-{
-  if (this == &other) return *this;
-  _native = other._native;
-  addItems();
-  return *this;
-}
-
-DNTTroubleCodeVector::~DNTTroubleCodeVector()
-{
-
-}
-
-void DNTTroubleCodeVector::addItems()
-{
-  if (!_native)
-    return;
-
-  int size = _native->size();
-  for (int i = 0; i < size; ++i) {
-    DNTTroubleCodeItem item(_native->at(i));
+  auto size = native->size();
+  for (decltype(size) i = 0; i < size; ++i) {
+    RTroubleCodeItem item(native->at(i));
     append(item);
   }
+}
+
+RTroubleCodeVector::RTroubleCodeVector()
+{
+
+}
+
+bool RTroubleCodeVector::isNull() const
+{
+  return _null;
 }

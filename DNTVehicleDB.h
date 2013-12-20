@@ -5,25 +5,26 @@
 #ifndef __DNT_VEHICLEDB_H__
 #define __DNT_VEHICLEDB_H__
 
-#include <QString>
-#include <QByteArray>
-#include <QSharedPointer>
 #include <DNTGlobal.h>
 
-class DNT_DIAG_DECL DNTVehicleDB
+class DNT_DIAG_DECL RVehicleDB
 {
+  template<typename NativePtr, typename Model> friend class RAbstractECU;
 private:
-  RVehicleDBPtr _native;
+  QByteArray _path;
+  QByteArray _name;
+  dnt::RVehicleDBPtr _native;
+protected:
+  const dnt::RVehicleDBPtr &getNative() const;
 public:
-  DNTVehicleDB(const QString &absPath, const QString &vName);
-  DNTVehicleDB(const DNTVehicleDB &other);
-  DNTVehicleDB& operator = (const DNTVehicleDB &other);
-  ~DNTVehicleDB();
+  RVehicleDB();
+  RVehicleDB(const QString &absPath, const QString &vName);
   bool open();
+  bool open(const QString &absPath, const QString &vName);
   void close();
   QString getText(const QString &name, const QString &sys);
-  RVehicleDBPtr &getNative();
-  const RVehicleDBPtr &getNative() const;
 };
+
+typedef QSharedPointer<RVehicleDB> RVehicleDBPtr;
 
 #endif // __DNT_VEHICLEDB_H__

@@ -7,50 +7,33 @@
 #include <dnt/RGLW80Commbox.h>
 #include <dnt/RICommbox.h>
 
-#include <DNTSerialPortThread.h>
-
-DNTCommbox::DNTCommbox(RCommboxVer ver)
+RCommbox::RCommbox(Version ver)
   : _ver(ver)
-  , _buffer(new RIOBuffer())
-  , _box(RCommboxFactoryInst().getCommbox(_buffer, _ver))
+  , _buffer(new dnt::RIOBuffer())
+  , _box(dnt::RCommboxFactoryInst().getCommbox(_buffer, static_cast<dnt::RCommboxVer>(_ver)))
   , _port()
 {
 
 }
 
-DNTCommbox::DNTCommbox(const DNTCommbox &other)
-  : _ver(other._ver)
-  , _buffer(other._buffer)
-  , _box(other._box)
-  , _port(other._port)
+RCommbox::RCommbox()
+  : _ver(UNKNOW)
+  , _buffer(new dnt::RIOBuffer())
+  , _box()
+  , _port()
 {
 
 }
 
-DNTCommbox& DNTCommbox::operator =(const DNTCommbox &other)
-{
-  if (this == &other) return *this;
-  _ver = other._ver;
-  _buffer = other._buffer;
-  _box = other._box;
-  _port = other._port;
-  return *this;
-}
-
-DNTCommbox::~DNTCommbox()
-{
-
-}
-
-void DNTCommbox::closeSerialPort()
+void RCommbox::closeSerialPort()
 {
   _port.reset(); // will close SerialPort also.
 }
 
-bool DNTCommbox::openC168SerialModel()
+bool RCommbox::openC168SerialModel()
 {
-  RGLC168CommboxPtr box = boost::dynamic_pointer_cast<RGLC168Commbox>(_box);
-  _port.reset(new DNTSerialPortThread(_buffer));
+  dnt::RGLC168CommboxPtr box = boost::dynamic_pointer_cast<dnt::RGLC168Commbox>(_box);
+  _port.reset(new RSerialPortThread(_buffer));
   auto infos = QSerialPortInfo::availablePorts();
   auto port = _port->getPort();
   for(auto info : infos) {
@@ -60,9 +43,9 @@ bool DNTCommbox::openC168SerialModel()
 
     port->setBaudRate(9600);
     port->setDataBits(8);
-    port->setStopBits(RSerialStopBits::One);
-    port->setParity(RSerialParity::None);
-    port->setHandshake(RSerialHandshake::None);
+    port->setStopBits(dnt::RSerialStopBits::One);
+    port->setParity(dnt::RSerialParity::None);
+    port->setHandshake(dnt::RSerialHandshake::None);
 
     port->setDtrEnable(false);
     QThread::msleep(50);
@@ -87,18 +70,18 @@ bool DNTCommbox::openC168SerialModel()
 
 }
 
-bool DNTCommbox::openW80SerialModel()
+bool RCommbox::openW80SerialModel()
 {
-  RGLW80CommboxPtr box = boost::dynamic_pointer_cast<RGLW80Commbox>(_box);
-  _port.reset(new DNTSerialPortThread(_buffer));
+  dnt::RGLW80CommboxPtr box = boost::dynamic_pointer_cast<dnt::RGLW80Commbox>(_box);
+  _port.reset(new RSerialPortThread(_buffer));
   auto infos = QSerialPortInfo::availablePorts();
   auto port = _port->getPort();
   for (auto info : infos) {
     port->setPortName(info.portName().toStdString());
     port->setBaudRate(115200);
-    port->setStopBits(RSerialStopBits::Two);
-    port->setParity(RSerialParity::None);
-    port->setHandshake(RSerialHandshake::None);
+    port->setStopBits(dnt::RSerialStopBits::Two);
+    port->setParity(dnt::RSerialParity::None);
+    port->setHandshake(dnt::RSerialHandshake::None);
     port->setDataBits(8);
     if (!port->open()) continue;
     _port->start();
@@ -113,27 +96,42 @@ bool DNTCommbox::openW80SerialModel()
   return false;
 }
 
-RCommboxVer DNTCommbox::getVersion()
+void RCommbox::setVersion(Version ver)
+{
+  if (_ver != ver) {
+    disconnect();
+    _ver = ver;
+    _box = dnt::RCommboxFactoryInst().getCommbox(_buffer, static_cast<dnt::RCommboxVer>(_ver));
+  }
+}
+
+RCommbox::Version RCommbox::getVersion()
 {
   return _ver;
 }
 
-bool DNTCommbox::connect()
+bool RCommbox::connect()
 {
-  auto ver = getVersion();
-  if (ver == RCommboxVer::C168) { // C168 and W80 only support SerialPort
+  if (!_box) return false;
+  if (_ver == C168) { // C168 and W80 only support SerialPort
     return openC168SerialModel();
-  } else if (ver == RCommboxVer::W80) {
+  } else if (_ver == W80) {
     return openW80SerialModel();
   }
   return false;
 }
 
-bool DNTCommbox::disconnect()
+bool RCommbox::connect(RCommbox::Version ver)
 {
-  auto ver = getVersion();
-  if (ver == RCommboxVer::C168 ||
-      ver == RCommboxVer::W80) { // C168 and W80 should shut down serialport and the thread
+  _ver = ver;
+  _box = dnt::RCommboxFactoryInst().getCommbox(_buffer, static_cast<dnt::RCommboxVer>(_ver));
+  return connect();
+}
+
+bool RCommbox::disconnect()
+{
+  if (!_box) return false;
+  if (_ver == C168 || _ver == W80) { // C168 and W80 should shut down serialport and the thread
     bool ret = true;
     if (_port) {
       ret = _box->disconnect();
@@ -144,12 +142,7 @@ bool DNTCommbox::disconnect()
   return false;
 }
 
-RICommboxPtr &DNTCommbox::getNative()
-{
-  return _box;
-}
-
-const RICommboxPtr &DNTCommbox::getNative() const
+const dnt::RICommboxPtr& RCommbox::getNative() const
 {
   return _box;
 }

@@ -1,7 +1,7 @@
 #include "DNTLiveDataItem.h"
 #include <dnt/RLiveDataItem.h>
 
-DNTLiveDataItem::DNTLiveDataItem(const RLiveDataItemPtr &native)
+RLiveDataItem::RLiveDataItem(const dnt::RLiveDataItemPtr &native)
   : _native(native)
   , _shortName()
   , _content()
@@ -19,7 +19,7 @@ DNTLiveDataItem::DNTLiveDataItem(const RLiveDataItemPtr &native)
   getDatas();
 }
 
-DNTLiveDataItem::DNTLiveDataItem()
+RLiveDataItem::RLiveDataItem()
   : _native()
   , _shortName()
   , _content()
@@ -37,46 +37,7 @@ DNTLiveDataItem::DNTLiveDataItem()
 
 }
 
-DNTLiveDataItem::DNTLiveDataItem(const DNTLiveDataItem &other)
-  : _native(other._native)
-  , _shortName(other._shortName)
-  , _content(other._content)
-  , _unit(other._unit)
-  , _defaultValue(other._defaultValue)
-  , _description(other._description)
-  , _cmdName(other._cmdName)
-  , _cmdClass(other._cmdClass)
-  , _minValue(other._minValue)
-  , _maxValue(other._maxValue)
-  , _index(other._index)
-  , _cmd(other._cmd)
-{
-
-}
-
-DNTLiveDataItem& DNTLiveDataItem::operator =(const DNTLiveDataItem &other)
-{
-  if (this == &other) return *this;
-  _native = other._native;
-  _shortName = other._shortName;
-  _content = other._content;
-  _unit = other._unit;
-  _defaultValue = other._defaultValue;
-  _description = other._description;
-  _cmdName = other._cmdName;
-  _cmdClass = other._cmdClass;
-  _minValue = other._minValue;
-  _maxValue = other._maxValue;
-  _index = other._index;
-  _cmd = other._cmd;
-  return *this;
-}
-
-DNTLiveDataItem::~DNTLiveDataItem()
-{
-}
-
-void DNTLiveDataItem::getDatas()
+void RLiveDataItem::getDatas()
 {
   if (!_native)
     return;
@@ -113,90 +74,95 @@ void DNTLiveDataItem::getDatas()
   _cmd = QByteArray((char*)buff.data(), buff.length());
 }
 
-const QString &DNTLiveDataItem::shortName() const
+const QString &RLiveDataItem::shortName() const
 {
   return _shortName;
 }
 
-const QString &DNTLiveDataItem::content() const
+const QString &RLiveDataItem::content() const
 {
   return _content;
 }
 
-const QString &DNTLiveDataItem::unit() const
+const QString &RLiveDataItem::unit() const
 {
   return _unit;
 }
 
-const QString &DNTLiveDataItem::defaultValue() const
+const QString &RLiveDataItem::defaultValue() const
 {
   return _defaultValue;
 }
 
-const QString &DNTLiveDataItem::description() const
+const QString &RLiveDataItem::description() const
 {
   return _description;
 }
 
-const QString &DNTLiveDataItem::cmdName() const
+const QString &RLiveDataItem::cmdName() const
 {
   return _cmdName;
 }
 
-const QString &DNTLiveDataItem::cmdClass() const
+const QString &RLiveDataItem::cmdClass() const
 {
   return _cmdClass;
 }
 
-QString DNTLiveDataItem::minValue()
+const QString &RLiveDataItem::minValue() const
 {
   return _minValue;
 }
 
-QString DNTLiveDataItem::maxValue()
+const QString &RLiveDataItem::maxValue() const
 {
   return _maxValue;
 }
 
-int DNTLiveDataItem::index() const
+int RLiveDataItem::index()
 {
   return _index;
 }
 
-int DNTLiveDataItem::position() const
+int RLiveDataItem::position()
 {
   return _native->getPosition();
 }
 
-QByteArray DNTLiveDataItem::command()
+const QByteArray &RLiveDataItem::command() const
 {
   return _cmd;
 }
 
-const QString &DNTLiveDataItem::value() const
+const QString &RLiveDataItem::value() const
 {
   auto str = _native->getValue();
   _value = QString::fromUtf8(str.c_str(), str.length());
   return _value;
 }
 
-bool DNTLiveDataItem::isEnabled() const
+bool RLiveDataItem::isEnabled() const
 {
   return _native->isEnabled();
 }
 
-bool DNTLiveDataItem::isShowed() const
+bool RLiveDataItem::isShowed() const
 {
   return _native->isShowed();
 }
 
-bool DNTLiveDataItem::isOutOfRange() const
+bool RLiveDataItem::isOutOfRange()
 {
   return _native->isOutOfRange();
 }
 
-bool operator==(const DNTLiveDataItem &left, const DNTLiveDataItem &right)
+void RLiveDataItem::setIsShowed(bool value)
 {
-  if (&left == &right) return true;
+  if (_native)
+    _native->setShowed(value);
+}
+
+bool operator == (const RLiveDataItem &left, const RLiveDataItem &right)
+{
   return left._native == right._native;
 }

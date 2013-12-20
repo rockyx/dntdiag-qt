@@ -5,10 +5,9 @@
 #ifndef __DNT_SYSTEM_DB_H__
 #define __DNT_SYSTEM_DB_H__
 
-#include <QString>
 #include <DNTGlobal.h>
 
-class DNT_DIAG_DECL DNTSystemDB
+class DNT_DIAG_DECL RSystemDB
 {
 public:
   static void init(const QString &path);
